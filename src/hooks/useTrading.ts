@@ -2,7 +2,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { calculateTradeData } from "@/utils/tradeCalculator";
 import { updateTradeDB } from "@/services/tradeService";
 import { getStockPrice } from "@/services/kisApi";
-import type { Stock, Holding, DisplayHolding } from "@/types/stock";
+import type { Stock, DisplayHolding } from "@/types/stock";
 
 export const useTrading = (
   myHoldings: DisplayHolding[],
