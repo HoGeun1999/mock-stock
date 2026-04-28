@@ -3,7 +3,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { supabase } from "@/lib/supabase";
 import { getCachedStockPrice } from "@/services/stockService";
 import { useTrading } from "./useTrading";
-import stockList from "@/data/stock.json";
 import type { Stock, DisplayHolding } from "@/types/stock";
 
 export const useDashboard = () => {
@@ -153,39 +152,22 @@ export const useDashboard = () => {
    * 검색 로직
    */
   const handleSearch = useCallback(
-    async (query: string) => {
-      const trimmedQuery = query.trim();
-      if (!trimmedQuery || isLoading) return;
-
-      const found = stockList.find(
-        (s) =>
-          s.name === trimmedQuery ||
-          s.code === trimmedQuery ||
-          s.name.includes(trimmedQuery),
-      );
-
-      const targetCode = found
-        ? found.code
-        : /^\d{6}$/.test(trimmedQuery)
-          ? trimmedQuery
-          : "";
-      const targetName = found ? found.name : `종목(${trimmedQuery})`;
-
-      if (!targetCode) return alert("검색 결과가 없습니다.");
+    async (code: string, name: string) => {
+      if (!code || isLoading) return;
 
       setIsLoading(true);
       try {
-        const data = await getCachedStockPrice(targetCode, targetName);
+        const data = await getCachedStockPrice(code, name);
         if (data && data.stck_prpr !== "0") {
           setStocks((prev) => [
             {
-              id: targetCode,
-              symbol: targetCode,
-              name: targetName,
+              id: code,
+              symbol: code,
+              name: name,
               price: parseInt(data.stck_prpr),
               change: parseFloat(data.prdy_ctrt),
             },
-            ...prev.filter((s) => s.symbol !== targetCode),
+            ...prev.filter((s) => s.symbol !== code),
           ]);
         } else {
           alert("시세 정보를 가져올 수 없는 종목입니다.");
